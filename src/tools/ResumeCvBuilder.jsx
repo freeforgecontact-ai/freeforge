@@ -2,58 +2,73 @@ import React, { useState } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function ResumeCvBuilder({ goBack }) {
-  const [data, setData] = useState('');
+  const [name, setName] = useState('Jean Tremblay');
+  const [title, setTitle] = useState('Développeur Web');
+  const [email, setEmail] = useState('jean.tremblay@email.com');
+  const [profile, setProfile] = useState('Développeur passionné avec 5 ans d\'expérience...');
+  const [experience, setExperience] = useState('2022 - Présent : Développeur chez Tech solutions');
   
   return (
     <div style={{ padding: 24, color: '#f3f4f6' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }} className="no-print">
         <div>
-          <button onClick={goBack} className="btn-premium btn-secondary" style={{ padding: '8px 12px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            ← Retour
-          </button>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'white', display: 'flex', alignItems: 'center', gap: 10 }}>
-            ✨ Resume/CV Builder
-          </h1>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-            Rédigez votre CV professionnel et exportez en PDF.
-          </p>
+          <button onClick={goBack} className="btn-premium btn-secondary" style={{ padding: '8px 12px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>← Retour</button>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'white' }}>📄 Resume/CV Builder & PDF Export</h1>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Créez votre curriculum vitæ professionnel prêt à imprimer en PDF.</p>
         </div>
-        <FolderButton toolId="resume_builder" toolName="ResumeCvBuilder" localStorageKeys={["fl_cv"]} />
+        <FolderButton toolId="resume_builder" toolName="ResumeCvBuilder" localStorageKeys={['fl_cv']} />
       </div>
 
-      <div className="glass-panel" style={{ padding: 24, borderRadius: 16 }}>
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 12, color: 'white' }}>Interface Interactive</h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 20 }}>
-          Cet outil fonctionne entièrement en local dans votre navigateur ou via les dossiers PC locaux configurés.
-        </p>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 500 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Paramètres / Entrées :</label>
-            <input 
-              type="text" 
-              value={data} 
-              onChange={(e) => setData(e.target.value)} 
-              className="input-premium" 
-              placeholder="Saisissez des paramètres..."
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 8 }}
-            />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        {/* Editor */}
+        <div className="glass-panel no-print" style={{ padding: 24, borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'white' }}>Champs du CV</h2>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Nom complet :</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8 }} />
           </div>
 
-          <div style={{ padding: 16, backgroundColor: 'rgba(255,255,255,0.02)', border: '1px dashed var(--border-light)', borderRadius: 10 }}>
-            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--secondary)', fontWeight: 'bold' }}>Résultat / Prévisualisation</span>
-            <div style={{ marginTop: 8, fontSize: '1rem', color: 'white', fontWeight: 600 }}>
-              {data ? `Aperçu : ${data}` : 'En attente d\'entrées...'}
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Titre Professionnel :</label>
+            <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8 }} />
           </div>
 
-          <button 
-            onClick={() => alert('Action effectuée localement !')} 
-            className="btn-premium btn-primary"
-            style={{ width: 'fit-content', padding: '10px 16px', borderRadius: 8, fontWeight: 'bold' }}
-          >
-            Lancer le traitement
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Courriel :</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8 }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Profil Professionnel :</label>
+            <textarea value={profile} onChange={e => setProfile(e.target.value)} className="input-premium" style={{ width: '100%', height: 80, padding: 8 }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Expériences :</label>
+            <textarea value={experience} onChange={e => setExperience(e.target.value)} className="input-premium" style={{ width: '100%', height: 100, padding: 8 }} />
+          </div>
+
+          <button onClick={() => window.print()} className="btn-premium btn-primary" style={{ width: '100%', padding: 12, borderRadius: 8, fontWeight: 'bold', justifyContent: 'center' }}>🖨️ Imprimer / Exporter en PDF</button>
+        </div>
+
+        {/* Paper Preview */}
+        <div style={{ backgroundColor: 'white', color: '#111827', padding: '40px 30px', borderRadius: 8, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', minHeight: 600, display: 'flex', flexDirection: 'column', gap: 24 }} className="cv-print-area">
+          <div style={{ borderBottom: '2px solid #2563eb', paddingBottom: 16 }}>
+            <h1 style={{ fontSize: '2rem', margin: 0, fontWeight: 800, color: '#1e3a8a' }}>{name}</h1>
+            <h2 style={{ fontSize: '1.2rem', margin: '4px 0 0 0', color: '#2563eb', fontWeight: 600 }}>{title}</h2>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: 8 }}>✉️ {email}</div>
+          </div>
+
+          <div>
+            <h3 style={{ fontSize: '1.1rem', margin: '0 0 8px 0', borderBottom: '1px solid #e5e7eb', paddingBottom: 4, color: '#1e3a8a' }}>Profil Professionnel</h3>
+            <p style={{ fontSize: '0.9rem', lineHeight: 1.5, margin: 0, color: '#374151', whiteSpace: 'pre-wrap' }}>{profile}</p>
+          </div>
+
+          <div>
+            <h3 style={{ fontSize: '1.1rem', margin: '0 0 8px 0', borderBottom: '1px solid #e5e7eb', paddingBottom: 4, color: '#1e3a8a' }}>Expérience Professionnelle</h3>
+            <p style={{ fontSize: '0.9rem', lineHeight: 1.5, margin: 0, color: '#374151', whiteSpace: 'pre-wrap' }}>{experience}</p>
+          </div>
         </div>
       </div>
     </div>

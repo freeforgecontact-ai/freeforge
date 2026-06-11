@@ -2,58 +2,76 @@ import React, { useState } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function TravelChecklist({ goBack }) {
-  const [data, setData] = useState('');
-  
+  const [climate, setClimate] = useState('cold');
+  const [list, setList] = useState([]);
+
+  const defaultItems = {
+    cold: ['Manteau chaud', 'Tuque et gants', 'Bottes antidérapantes', 'Chaussettes de laine', 'Passeport', 'Assurance Voyage'],
+    hot: ['Maillot de bain', 'Crème solaire', 'Lunettes de soleil', 'Chapeau / Casquette', 'Sandales', 'Passeport']
+  };
+
+  const handleGenerate = () => {
+    setList(defaultItems[climate].map(item => ({ name: item, checked: false })));
+  };
+
+  const handleToggle = (idx) => {
+    setList(prev => prev.map((item, i) => i === idx ? { ...item, checked: !item.checked } : item));
+  };
+
   return (
     <div style={{ padding: 24, color: '#f3f4f6' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }} className="no-print">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <button onClick={goBack} className="btn-premium btn-secondary" style={{ padding: '8px 12px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            ← Retour
-          </button>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'white', display: 'flex', alignItems: 'center', gap: 10 }}>
-            ✨ Checklist de Voyage Dynamique
-          </h1>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-            Valise optimisée selon la météo locale.
-          </p>
+          <button onClick={goBack} className="btn-premium btn-secondary" style={{ padding: '8px 12px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>← Retour</button>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'white' }}>🎒 Checklist de Voyage Dynamique</h1>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Préparez vos valises intelligemment en fonction du climat de destination.</p>
         </div>
-        <FolderButton toolId="travel_checklist" toolName="TravelChecklist" localStorageKeys={["fl_travel"]} />
+        <FolderButton toolId="travel_checklist" toolName="TravelChecklist" localStorageKeys={['fl_travel']} />
       </div>
 
-      <div className="glass-panel" style={{ padding: 24, borderRadius: 16 }}>
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 12, color: 'white' }}>Interface Interactive</h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 20 }}>
-          Cet outil fonctionne entièrement en local dans votre navigateur ou via les dossiers PC locaux configurés.
-        </p>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 500 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 24 }}>
+        <div className="glass-panel" style={{ padding: 20, borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 14, height: 'fit-content' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>Options</h2>
+          
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Paramètres / Entrées :</label>
-            <input 
-              type="text" 
-              value={data} 
-              onChange={(e) => setData(e.target.value)} 
-              className="input-premium" 
-              placeholder="Saisissez des paramètres..."
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 8 }}
-            />
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Climat :</label>
+            <select value={climate} onChange={e => setClimate(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+              <option value="cold">Froid / Hivernal</option>
+              <option value="hot">Chaud / Tropical</option>
+            </select>
           </div>
 
-          <div style={{ padding: 16, backgroundColor: 'rgba(255,255,255,0.02)', border: '1px dashed var(--border-light)', borderRadius: 10 }}>
-            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--secondary)', fontWeight: 'bold' }}>Résultat / Prévisualisation</span>
-            <div style={{ marginTop: 8, fontSize: '1rem', color: 'white', fontWeight: 600 }}>
-              {data ? `Aperçu : ${data}` : 'En attente d\'entrées...'}
-            </div>
-          </div>
+          <button onClick={handleGenerate} className="btn-premium btn-primary" style={{ width: '100%', padding: 10, borderRadius: 8, fontWeight: 'bold', justifyContent: 'center', marginTop: 8 }}>⚡ Générer la valise</button>
+        </div>
 
-          <button 
-            onClick={() => alert('Action effectuée localement !')} 
-            className="btn-premium btn-primary"
-            style={{ width: 'fit-content', padding: '10px 16px', borderRadius: 8, fontWeight: 'bold' }}
-          >
-            Lancer le traitement
-          </button>
+        <div className="glass-panel" style={{ padding: 24, borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'white' }}>Ma Valise</h2>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {list.length > 0 ? list.map((item, idx) => (
+              <label 
+                key={idx}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '12px 16px',
+                  backgroundColor: item.checked ? 'rgba(16,185,129,0.05)' : 'rgba(255,255,255,0.01)',
+                  borderRadius: 8,
+                  border: '1px solid var(--border-light)',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem'
+                }}
+              >
+                <input type="checkbox" checked={item.checked} onChange={() => handleToggle(idx)} />
+                <span style={{ textDecoration: item.checked ? 'line-through' : 'none', color: item.checked ? 'var(--text-muted)' : 'white' }}>
+                  {item.name}
+                </span>
+              </label>
+            )) : (
+              <div style={{ padding: 20, textAlign: 'center', fontStyle: 'italic', color: 'var(--text-muted)' }}>Générez une checklist pour commencer.</div>
+            )}
+          </div>
         </div>
       </div>
     </div>
