@@ -1,6 +1,6 @@
 # FreeForge - Document de Transfert Technique (Handoff) Global
 
-Ce document fournit un guide technique ultra-complet de l'architecture, du fonctionnement et de l'implémentation de la plateforme **FreeForge** (`freeforge.pgrg.ca`). Il décrit la configuration des **10 applications distinctes** fonctionnant en monorepo local et s'appuyant sur un serveur backend unifié. 
+Ce document fournit un guide technique ultra-complet de l'architecture, du fonctionnement et de l'implémentation de la plateforme **FreeForge** (`freeforge.pgrg.ca`). Il décrit la configuration des **13 applications distinctes** fonctionnant en monorepo local et s'appuyant sur un serveur backend unifié. 
 
 Il est conçu pour permettre à tout développeur ou modèle d'IA (même local ou léger, comme Claude Sonnet / Haiku) de corriger des bogues, de modifier les fonctionnalités actuelles, ou de rajouter de nouveaux outils sans friction.
 
@@ -23,6 +23,9 @@ La plateforme utilise un **NPM Workspace** (monorepo) structuré comme suit :
 *   `freeforge-creators` (Suite Créateurs & Design) : **Port 5181**
 *   `freeforge-travel` (Suite Voyage & Aventure) : **Port 5182**
 *   `freeforge-healthy` (Suite Cuisine & Santé Corporelle) : **Port 5183**
+*   `freeforge-office` (Suite Productivité Administrative) : **Port 5184**
+*   `freeforge-security` (Suite Sécurité & Cryptographie) : **Port 5185**
+*   `freeforge-audio` (Suite Audio Créative) : **Port 5186**
 
 ---
 
@@ -40,7 +43,7 @@ L'outil `WebToExecutable` dans la suite `freeforge-dev2` appelle les points d'ac
 
 ---
 
-## 3. Descriptif Complet des Outils par Suite (90 Outils au Total)
+## 3. Descriptif Complet des Outils par Suite (114 Outils au Total)
 
 ### ⚜️ Suite 1 : FreeForge Majeure (`freeforge` - Port 5174)
 1.  **VibeLocal (Radio Premium)** : Lecteur de musique local contournant le blocage IP YouTube par l'argument `--extractor-args youtube:player_client=android` et authentification par fichier local `cookies.txt`.
@@ -152,14 +155,44 @@ L'outil `WebToExecutable` dans la suite `freeforge-dev2` appelle les points d'ac
 7.  **Calculateur de Nutriments & Macros** : Équilibrage de l'apport énergétique quotidien.
 8.  **Ambient soundscape for Meditation** : Console de mixage audio relaxante.
 
+### 📋 Suite 11 : Productivité Administrative (`freeforge-office` - Port 5184)
+1.  **Signateur PDF Local (`SignPDF.jsx`)** : Glisser-déposer un PDF, dessiner sa signature sur canvas, puis l'incruster visuellement sur les pages avec contrôle de position/taille, et export PDF.
+2.  **Extracteur de Texte OCR Local (`OcrExtractor.jsx`)** : Analyse locale d'images et photos de documents via `Tesseract.js` pour en extraire le texte éditable.
+3.  **Comparateur de Fichiers Visuel (`DiffChecker.jsx`)** : Comparaison de texte côte-à-côte avec surbrillance syntaxique des différences et défilement synchronisé.
+4.  **Renommeur de Fichiers en Lot (`BulkRenamer.jsx`)** : Import de fichiers avec règles de renommage Regex/numérotation et export de scripts batch/PowerShell.
+5.  **Générateur de Codes QR Stylisés (`QrGenerator.jsx`)** : Générateur de QR codes avec dégradés, logos personnalisés incrustés et coins arrondis pour URL, vCard et Wi-Fi.
+6.  **Éditeur de Tableur CSV (`CsvEditor.jsx`)** : Tableur interactif épuré pour visualiser, trier, filtrer et modifier des données CSV en local avec export en JSON/CSV.
+7.  **Générateur de Contrats & NDA (`ContractGenerator.jsx`)** : Formulaires guidés pour remplir et exporter en PDF/Markdown des modèles d'accords NDA ou de services freelance.
+8.  **Compresseur ZIP Local (`ZipArchiver.jsx`)** : Archiveur client-side utilisant `jszip` pour compresser/extraire des fichiers ZIP en local.
+
+### 🔒 Suite 12 : Sécurité & Cryptographie (`freeforge-security` - Port 5185)
+1.  **Chiffreur de Fichiers AES-256 (`AesEncryptor.jsx`)** : Chiffrement et déchiffrement local de fichiers avec mot de passe en utilisant l'API Web Crypto native du navigateur.
+2.  **Nettoyeur de Métadonnées (`ExifCleaner.jsx`)** : Supprime toutes les balises sensibles EXIF/GPS des images via Canvas avant téléchargement.
+3.  **Générateur de Clés PGP & SSH (`KeyGenerator.jsx`)** : Outil client-side pour générer des paires de clés publiques/privées RSA et ECDSA directement dans le navigateur.
+4.  **Calculateur de Hash (`HashCalculator.jsx`)** : Calcule en direct les codes MD5, SHA-1, SHA-256 et SHA-512 pour du texte ou des fichiers locaux.
+5.  **Phrase de Récupération BIP39 (`Bip39Generator.jsx`)** : Générateur de phrases mnémoniques (12/24 mots) basées sur l'entropie utilisateur récoltée par mouvements de souris.
+6.  **Stéganographie (`Steganography.jsx`)** : Permet de dissimuler ou d'extraire du texte secret dans les bits de poids faible des pixels d'une image hôte PNG.
+7.  **Analyseur de Force de Mots de Passe (`PasswordAnalyzer.jsx`)** : Calculateur d'entropie avec dictionnaire local, temps estimé de cassage et recommandations de sécurité.
+8.  **Inspecteur de Redirections & En-têtes (`HttpInspector.jsx`)** : Traceur de chaîne complète de redirections HTTP et analyseur d'en-têtes de sécurité (CORS, CSP, X-Frame).
+
+### 🎵 Suite 13 : Audio Créative (`freeforge-audio` - Port 5186)
+1.  **Boîte à Rythmes Virtuelle (`DrumMachine.jsx`)** : Grille 16 pas pour 4 pistes rythmiques utilisant des sons synthétisés via l'API Web Audio avec contrôle BPM.
+2.  **Accordeur d'Instruments Chromatique (`GuitarTuner.jsx`)** : Analyseur de pitch en temps réel via l'entrée microphone, affichant une aiguille de fréquence et la note la plus proche.
+3.  **Visualiseur Audio 3D (`AudioVisualizer.jsx`)** : Lecteur de fichiers audio locaux projetant un spectre de fréquences animé (ondes, cercles, barres réactives) sur Canvas.
+4.  **Piano Polyphonique Interactif (`VirtualPiano.jsx`)** : Clavier de piano réactif au toucher et au clavier azerty/qwerty physique, avec enregistrement et export WAV.
+5.  **Modificateur d'Effets Vocaux (`VoiceChanger.jsx`)** : Filtre d'effets audio en temps réel pour le microphone (robotique, walkie-talkie, écho de cathédrale) via Web Audio.
+6.  **Looper Multi-Pistes Local (`AudioLooper.jsx`)** : Enregistreur audio multi-couches permettant d'empiler plusieurs enregistrements du micro sur une boucle de base.
+7.  **Transpositeur d'Accords (`ChordTransposer.jsx`)** : Outil de transposition de partitions musicales avec grilles d'accords interactives et synthèse audio des accords par clic.
+8.  **Générateur de Sons Ambiants (`SoundscapeGenerator.jsx`)** : Console de mixage multipistes de bruits de nature (pluie, vagues, feu de camp, bols tibétains) synthétisés localement.
+
 ---
 
 ## 4. Instructions de Maintenance & Débogage pour les IA
 
 1.  **Lancement local global** :
-    Pour lancer l'ensemble des 10 serveurs de dev, vous pouvez lancer `npm run dev` dans chaque dossier de workspace respectif, ou utiliser la commande de démarrage groupée.
+    Pour lancer l'ensemble des 13 serveurs de dev, vous pouvez lancer `npm run dev` dans chaque dossier de workspace respectif, ou utiliser la commande de démarrage groupée.
 2.  **Découpage et compilation** :
-    Chaque projet compile de façon isolée. Si vous modifiez un fichier partagé ou un composant comme `FolderButton.jsx`, exécutez `npm run build` à la racine pour vous assurer que les 9 workspaces de l'application se compilent sans problème :
+    Chaque projet compile de façon isolée. Si vous modifiez un fichier partagé ou un composant comme `FolderButton.jsx`, exécutez `npm run build` à la racine pour vous assurer que les 12 workspaces de l'application se compilent sans problème :
     `npm run build --workspaces`
 3.  **Bugs de formatage JSON dans le localStorage** :
     Si une IA ajoute des données locales complexes, assurez-vous de toujours utiliser `try { JSON.parse(...) } catch` pour éviter les plantages au chargement de l'outil si la clé du `localStorage` contient des données corrompues ou obsolètes.
