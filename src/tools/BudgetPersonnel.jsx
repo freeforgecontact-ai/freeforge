@@ -1,11 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function BudgetPersonnel({ goBack }) {
-  const [income, setIncome] = useState(3000);
-  const [needs, setNeeds] = useState(1400);
-  const [wants, setWants] = useState(800);
-  const [savings, setSavings] = useState(500);
+  const [income, setIncome] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_budget');
+      return saved ? parseFloat(JSON.parse(saved).income) : 3000;
+    } catch { return 3000; }
+  });
+  const [needs, setNeeds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_budget');
+      return saved ? parseFloat(JSON.parse(saved).needs) : 1400;
+    } catch { return 1400; }
+  });
+  const [wants, setWants] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_budget');
+      return saved ? parseFloat(JSON.parse(saved).wants) : 800;
+    } catch { return 800; }
+  });
+  const [savings, setSavings] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_budget');
+      return saved ? parseFloat(JSON.parse(saved).savings) : 500;
+    } catch { return 500; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('fl_budget', JSON.stringify({ income, needs, wants, savings }));
+  }, [income, needs, wants, savings]);
 
   const getPercent = (val) => income > 0 ? ((val / income) * 100).toFixed(1) : 0;
 

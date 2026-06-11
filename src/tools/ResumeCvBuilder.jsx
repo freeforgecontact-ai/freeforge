@@ -1,12 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function ResumeCvBuilder({ goBack }) {
-  const [name, setName] = useState('Jean Tremblay');
-  const [title, setTitle] = useState('Développeur Web');
-  const [email, setEmail] = useState('jean.tremblay@email.com');
-  const [profile, setProfile] = useState('Développeur passionné avec 5 ans d\'expérience...');
-  const [experience, setExperience] = useState('2022 - Présent : Développeur chez Tech solutions');
+  const [name, setName] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_cv');
+      return saved ? JSON.parse(saved).name : 'Jean Tremblay';
+    } catch { return 'Jean Tremblay'; }
+  });
+  const [title, setTitle] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_cv');
+      return saved ? JSON.parse(saved).title : 'Développeur Web';
+    } catch { return 'Développeur Web'; }
+  });
+  const [email, setEmail] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_cv');
+      return saved ? JSON.parse(saved).email : 'jean.tremblay@email.com';
+    } catch { return 'jean.tremblay@email.com'; }
+  });
+  const [profile, setProfile] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_cv');
+      return saved ? JSON.parse(saved).profile : 'Développeur passionné avec 5 ans d\'expérience...';
+    } catch { return 'Développeur passionné avec 5 ans d\'expérience...'; }
+  });
+  const [experience, setExperience] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fl_cv');
+      return saved ? JSON.parse(saved).experience : '2022 - Présent : Développeur chez Tech solutions';
+    } catch { return '2022 - Présent : Développeur chez Tech solutions'; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('fl_cv', JSON.stringify({ name, title, email, profile, experience }));
+  }, [name, title, email, profile, experience]);
   
   return (
     <div style={{ padding: 24, color: '#f3f4f6' }}>
