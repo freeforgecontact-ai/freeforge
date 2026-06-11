@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
 import ytSearch from 'yt-search';
 import JSZip from 'jszip';
+import multer from 'multer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1136,6 +1137,277 @@ pause
   } catch (error) {
     console.error('Packaging apk error:', error);
     res.status(500).json({ error: error.message || 'Failed to package apk' });
+  }
+});
+
+// Setup temp directories for media uploads and conversions
+const uploadDir = path.join(__dirname, 'temp_uploads');
+const convertDir = path.join(__dirname, 'temp_converted');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+if (!fs.existsSync(convertDir)) fs.mkdirSync(convertDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, 'file-' + uniqueSuffix + ext);
+  }
+});
+const upload = multer({ storage });
+
+// In-memory job store
+const mediaJobs = {};
+
+// Helper: Convert Duration to seconds
+function durationToSeconds(h, m, s, ms) {
+  return parseInt(h, 10) * 3600 + parseInt(m, 10) * 60 + parseInt(s, 10) + parseFloat('0.' + ms);
+}
+
+// 1. Upload files endpoint
+app.post('/api/media/upload', upload.array('files'), (req, res) => {
+  try {
+    const uploadedFiles = req.files.map(file => ({
+      id: path.basename(file.path, path.extname(file.path)),
+      originalName: file.originalname,
+      path: file.path,
+      size: file.size,
+      mimeType: file.mimetype
+    }));
+    res.json({ files: uploadedFiles });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ error: "Failed to upload files" });
+  }
+});
+
+// 2. Start conversion batch job endpoint
+app.post('/api/media/convert', (req, res) => {
+  const { files, options } = req.body;
+  if (!files || !Array.isArray(files) || files.length === 0) {
+    return res.status(400).json({ error: "No files specified for conversion" });
+  }
+
+  const jobId = 'job-' + Date.now() + '-' + Math.round(Math.random() * 1e5);
+  mediaJobs[jobId] = {
+    id: jobId,
+    status: 'processing',
+    progress: 0,
+    files: files.map(f => ({
+      id: f.id,
+      originalName: f.originalName,
+      path: f.path,
+      targetFormat: f.targetFormat,
+      status: 'pending',
+      progress: 0,
+      error: null,
+      outputPath: null,
+      outputName: null
+    }))
+  };
+
+  // Run conversion in background
+  runBatchConversion(jobId, options);
+
+  res.json({ jobId });
+});
+
+// 3. Conversion queue logic (background processor)
+async function runBatchConversion(jobId, globalOptions = {}) {
+  const job = mediaJobs[jobId];
+  if (!job) return;
+
+  console.log(`Starting batch media conversion job: ${jobId}`);
+
+  for (let i = 0; i < job.files.length; i++) {
+    const file = job.files[i];
+    file.status = 'processing';
+    console.log(`Converting ${file.originalName} to ${file.targetFormat}...`);
+
+    try {
+      const inputPath = file.path;
+      const targetFormat = file.targetFormat.toLowerCase();
+      const outputName = `${file.id}.${targetFormat}`;
+      const outputPath = path.join(convertDir, outputName);
+      
+      const fileOptions = globalOptions[file.id] || globalOptions;
+      
+      const isVideo = file.originalName.match(/\.(mp4|webm|mkv|avi|mov|flv|wmv|m4v|3gp)$/i);
+      const isAudio = file.originalName.match(/\.(mp3|wav|ogg|m4a|aac|flac)$/i);
+      
+      const args = ['-y', '-i', inputPath];
+      
+      if (targetFormat === 'mp4') {
+        if (fileOptions.resolution && fileOptions.resolution !== 'original') {
+          let scaleVal = '';
+          if (fileOptions.resolution === '1080p') scaleVal = 'scale=1920:-2';
+          else if (fileOptions.resolution === '720p') scaleVal = 'scale=1280:-2';
+          else if (fileOptions.resolution === '480p') scaleVal = 'scale=854:-2';
+          if (scaleVal) args.push('-vf', scaleVal);
+        }
+        args.push('-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k');
+      } else if (targetFormat === 'webm') {
+        if (fileOptions.resolution && fileOptions.resolution !== 'original') {
+          let scaleVal = '';
+          if (fileOptions.resolution === '1080p') scaleVal = 'scale=1920:-2';
+          else if (fileOptions.resolution === '720p') scaleVal = 'scale=1280:-2';
+          else if (fileOptions.resolution === '480p') scaleVal = 'scale=854:-2';
+          if (scaleVal) args.push('-vf', scaleVal);
+        }
+        args.push('-c:v', 'libvpx-vp9', '-c:a', 'libopus', '-b:a', '128k');
+      } else if (targetFormat === 'mp3') {
+        args.push('-vn', '-c:a', 'libmp3lame');
+        if (fileOptions.audioBitrate) {
+          args.push('-b:a', fileOptions.audioBitrate);
+        } else {
+          args.push('-q:a', '2');
+        }
+      } else if (targetFormat === 'wav') {
+        args.push('-vn', '-c:a', 'pcm_s16le');
+      } else if (targetFormat === 'webp') {
+        if (!isVideo && !isAudio) {
+          if (fileOptions.imageWidth || fileOptions.imageHeight) {
+            const w = fileOptions.imageWidth || '-1';
+            const h = fileOptions.imageHeight || '-1';
+            args.push('-vf', `scale=${w}:${h}`);
+          }
+          args.push('-quality', String(fileOptions.quality || 80));
+        } else {
+          args.push('-c:v', 'libwebp', '-lossless', '0', '-compression_level', '4');
+        }
+      } else if (targetFormat === 'gif') {
+        args.push('-vf', 'fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse');
+      } else {
+        if (!isVideo && !isAudio && (fileOptions.imageWidth || fileOptions.imageHeight)) {
+          const w = fileOptions.imageWidth || '-1';
+          const h = fileOptions.imageHeight || '-1';
+          args.push('-vf', `scale=${w}:${h}`);
+        }
+      }
+
+      args.push(outputPath);
+
+      await new Promise((resolve, reject) => {
+        const child = spawn('ffmpeg', args);
+        let totalDuration = 0;
+
+        child.stderr.on('data', (data) => {
+          const text = data.toString();
+          const durMatch = text.match(/Duration:\s+(\d+):(\d+):(\d+)\.(\d+)/);
+          if (durMatch) {
+            totalDuration = durationToSeconds(durMatch[1], durMatch[2], durMatch[3], durMatch[4]);
+          }
+
+          const timeMatch = text.match(/time=(\d+):(\d+):(\d+)\.(\d+)/);
+          if (timeMatch && totalDuration > 0) {
+            const currentTime = durationToSeconds(timeMatch[1], timeMatch[2], timeMatch[3], timeMatch[4]);
+            const progress = Math.min(99, Math.round((currentTime / totalDuration) * 100));
+            file.progress = progress;
+            updateJobProgress(jobId);
+          }
+        });
+
+        child.on('close', (code) => {
+          if (code === 0) {
+            file.status = 'completed';
+            file.progress = 100;
+            file.outputPath = outputPath;
+            file.outputName = outputName;
+            resolve();
+          } else {
+            reject(new Error(`FFmpeg failed with code ${code}`));
+          }
+        });
+
+        child.on('error', (err) => {
+          reject(err);
+        });
+      });
+
+    } catch (err) {
+      console.error(`Error converting ${file.originalName}:`, err);
+      file.status = 'failed';
+      file.error = err.message || "Conversion error";
+    }
+
+    updateJobProgress(jobId);
+  }
+
+  const hasFailures = job.files.some(f => f.status === 'failed');
+  const allSucceeded = job.files.every(f => f.status === 'completed');
+  
+  if (allSucceeded) {
+    job.status = 'completed';
+  } else if (hasFailures) {
+    job.status = 'failed';
+  }
+  job.progress = 100;
+  console.log(`Batch job ${jobId} finished with status: ${job.status}`);
+}
+
+function updateJobProgress(jobId) {
+  const job = mediaJobs[jobId];
+  if (!job) return;
+  const totalFiles = job.files.length;
+  const totalProgress = job.files.reduce((sum, f) => sum + f.progress, 0);
+  job.progress = Math.round(totalProgress / totalFiles);
+}
+
+// 4. Job status polling endpoint
+app.get('/api/media/job/:jobId', (req, res) => {
+  const job = mediaJobs[req.params.jobId];
+  if (!job) {
+    return res.status(404).json({ error: "Job not found" });
+  }
+  res.json(job);
+});
+
+// 5. Download individual file endpoint
+app.get('/api/media/download/:fileId', (req, res) => {
+  const fileId = req.params.fileId;
+  
+  let targetFile = null;
+  for (const jobId in mediaJobs) {
+    const file = mediaJobs[jobId].files.find(f => f.id === fileId);
+    if (file && file.outputPath && fs.existsSync(file.outputPath)) {
+      targetFile = file;
+      break;
+    }
+  }
+
+  if (!targetFile) {
+    return res.status(404).json({ error: "Converted file not found" });
+  }
+
+  res.download(targetFile.outputPath, targetFile.outputName);
+});
+
+// 6. Download ZIP of all completed job files endpoint
+app.get('/api/media/download-zip/:jobId', async (req, res) => {
+  const job = mediaJobs[req.params.jobId];
+  if (!job) {
+    return res.status(404).json({ error: "Job not found" });
+  }
+
+  const completedFiles = job.files.filter(f => f.status === 'completed' && f.outputPath && fs.existsSync(f.outputPath));
+  if (completedFiles.length === 0) {
+    return res.status(400).json({ error: "No completed files available in this job" });
+  }
+
+  try {
+    const zip = new JSZip();
+    completedFiles.forEach(file => {
+      const fileData = fs.readFileSync(file.outputPath);
+      zip.file(file.outputName, fileData);
+    });
+
+    const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="converted_media_${job.id}.zip"`);
+    res.send(zipBuffer);
+  } catch (err) {
+    console.error("Failed to create ZIP:", err);
+    res.status(500).json({ error: "Failed to generate ZIP file" });
   }
 });
 
