@@ -1,9 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function MealPrepMenu({ goBack }) {
-  const [data, setData] = useState('');
-  
+  const [meals, setMeals] = useState(() => {
+    const saved = localStorage.getItem('ff_mealprep');
+    return saved ? JSON.parse(saved) : {
+      Lundi: { breakfast: 'Gruau aux fruits', lunch: 'Salade de poulet', dinner: 'Saumon au four' },
+      Mardi: { breakfast: 'Gruau aux fruits', lunch: 'Salade de poulet', dinner: 'Sauté de bœuf' },
+      Mercredi: { breakfast: 'Œufs brouillés', lunch: 'Sauté de bœuf', dinner: 'Pâtes pesto' }
+    };
+  });
+
+  const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+  useEffect(() => {
+    localStorage.setItem('ff_mealprep', JSON.stringify(meals));
+  }, [meals]);
+
+  const handleChange = (day, mealType, val) => {
+    setMeals({
+      ...meals,
+      [day]: {
+        ...meals[day],
+        [mealType]: val
+      }
+    });
+  };
+
   return (
     <div style={{ padding: 24, color: '#f3f4f6' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }} className="no-print">
@@ -12,49 +35,36 @@ export default function MealPrepMenu({ goBack }) {
             ← Retour
           </button>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'white', display: 'flex', alignItems: 'center', gap: 10 }}>
-            ✨ Meal Prep Menu Planner
+            🍳 Meal Prep Weekly Planner
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-            Planifiez vos repas de la semaine.
+            Organisez vos repas de la semaine et exportez votre plan alimentaire localement.
           </p>
         </div>
-        <FolderButton toolId="meal_prep" toolName="MealPrepMenu" localStorageKeys={["fh_meals"]} />
+        <FolderButton toolId="mealprep" toolName="MealPrepMenu" localStorageKeys={["ff_mealprep"]} />
       </div>
 
-      <div className="glass-panel" style={{ padding: 24, borderRadius: 16 }}>
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 12, color: 'white' }}>Interface Interactive</h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 20 }}>
-          Cet outil fonctionne entièrement en local dans votre navigateur ou via les dossiers PC locaux configurés.
-        </p>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 500 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Paramètres / Entrées :</label>
-            <input 
-              type="text" 
-              value={data} 
-              onChange={(e) => setData(e.target.value)} 
-              className="input-premium" 
-              placeholder="Saisissez des paramètres..."
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 8 }}
-            />
-          </div>
-
-          <div style={{ padding: 16, backgroundColor: 'rgba(255,255,255,0.02)', border: '1px dashed var(--border-light)', borderRadius: 10 }}>
-            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--secondary)', fontWeight: 'bold' }}>Résultat / Prévisualisation</span>
-            <div style={{ marginTop: 8, fontSize: '1rem', color: 'white', fontWeight: 600 }}>
-              {data ? `Aperçu : ${data}` : 'En attente d\'entrées...'}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
+        {days.map(d => {
+          const item = meals[d] || { breakfast: '', lunch: '', dinner: '' };
+          return (
+            <div key={d} className="glass-panel" style={{ padding: 18, borderRadius: 12, display: 'grid', gridTemplateColumns: '120px repeat(3, 1fr)', gap: 12, alignItems: 'center' }}>
+              <span style={{ fontWeight: 'bold', fontSize: '1rem', color: 'white' }}>{d}</span>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Déjeuner</label>
+                <input type="text" value={item.breakfast} onChange={(e) => handleChange(d, 'breakfast', e.target.value)} className="input-premium" style={{ width: '90%', marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Dîner</label>
+                <input type="text" value={item.lunch} onChange={(e) => handleChange(d, 'lunch', e.target.value)} className="input-premium" style={{ width: '90%', marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Souper</label>
+                <input type="text" value={item.dinner} onChange={(e) => handleChange(d, 'dinner', e.target.value)} className="input-premium" style={{ width: '90%', marginTop: 4 }} />
+              </div>
             </div>
-          </div>
-
-          <button 
-            onClick={() => alert('Action effectuée localement !')} 
-            className="btn-premium btn-primary"
-            style={{ width: 'fit-content', padding: '10px 16px', borderRadius: 8, fontWeight: 'bold' }}
-          >
-            Lancer le traitement
-          </button>
-        </div>
+          );
+        })}
       </div>
     </div>
   );
