@@ -10,6 +10,7 @@ import GitVisualizer from './tools/GitVisualizer';
 import FlexboxPlayground from './tools/FlexboxPlayground';
 import ColorContrastChecker from './tools/ColorContrastChecker';
 import WebToExecutable from './tools/WebToExecutable';
+import MediaConverter from './tools/MediaConverter';
 
 export default function App() {
   const [activeTool, setActiveTool] = useState(null); // null means dashboard
@@ -122,6 +123,18 @@ export default function App() {
         </svg>
       ),
       component: <WebToExecutable goBack={() => setActiveTool(null)} />
+    },
+    {
+      id: 'media_converter',
+      title: 'Convertisseur de Médias',
+      desc: 'Convertissez et redimensionnez en lot vos images, vidéos et fichiers audio 100% localement.',
+      category: 'compiler',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" style={{width:24, height:24}}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      ),
+      component: <MediaConverter goBack={() => setActiveTool(null)} />
     }
   ];
 
