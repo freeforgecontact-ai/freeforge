@@ -2,15 +2,27 @@ import React, { useState } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function FlexboxPlayground({ goBack }) {
+  const [activeTab, setActiveTab] = useState('flex'); // 'flex' | 'grid'
+
+  // Flexbox states
   const [direction, setDirection] = useState('row');
   const [justify, setJustify] = useState('flex-start');
   const [align, setAlign] = useState('stretch');
   const [wrap, setWrap] = useState('nowrap');
+
+  // Grid states
+  const [gridCols, setGridCols] = useState('repeat(3, 1fr)');
+  const [gridRows, setGridRows] = useState('auto');
+  const [justifyItems, setJustifyItems] = useState('stretch');
+  const [alignItems, setAlignItems] = useState('stretch');
+
+  // Common states
   const [gap, setGap] = useState(16);
-  const [itemCount, setItemCount] = useState(4);
+  const [itemCount, setItemCount] = useState(6);
 
   const generateCss = () => {
-    return `.flex-container {
+    if (activeTab === 'flex') {
+      return `.flex-container {
   display: flex;
   flex-direction: ${direction};
   justify-content: ${justify};
@@ -18,6 +30,16 @@ export default function FlexboxPlayground({ goBack }) {
   flex-wrap: ${wrap};
   gap: ${gap}px;
 }`;
+    } else {
+      return `.grid-container {
+  display: grid;
+  grid-template-columns: ${gridCols};
+  grid-template-rows: ${gridRows};
+  justify-items: ${justifyItems};
+  align-items: ${alignItems};
+  gap: ${gap}px;
+}`;
+    }
   };
 
   const handleCopyCss = () => {
@@ -36,65 +58,130 @@ export default function FlexboxPlayground({ goBack }) {
             🔲 Flexbox & Grid Playground
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-            Concevez et visualisez vos mises en page CSS Flexbox en direct et exportez le code épuré.
+            Concevez et visualisez vos mises en page CSS Flexbox et Grid en direct et exportez le code épuré.
           </p>
         </div>
         <FolderButton toolId="flexbox_playground" toolName="FlexboxPlayground" />
       </div>
 
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }} className="no-print">
+        <button 
+          onClick={() => setActiveTab('flex')} 
+          className={`btn-premium ${activeTab === 'flex' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ padding: '10px 20px', borderRadius: 8, fontWeight: 'bold' }}
+        >
+          🔀 Mode Flexbox
+        </button>
+        <button 
+          onClick={() => setActiveTab('grid')} 
+          className={`btn-premium ${activeTab === 'grid' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ padding: '10px 20px', borderRadius: 8, fontWeight: 'bold' }}
+        >
+          🕸️ Mode CSS Grid
+        </button>
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 24 }}>
+        
         {/* Left column: Controls */}
         <div className="glass-panel" style={{ padding: 20, borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>Options de Flexbox</h2>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white', margin: 0 }}>
+            {activeTab === 'flex' ? 'Options de Flexbox' : 'Options de CSS Grid'}
+          </h2>
 
-          {/* flex-direction */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>flex-direction :</label>
-            <select value={direction} onChange={(e) => setDirection(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
-              <option value="row">row</option>
-              <option value="row-reverse">row-reverse</option>
-              <option value="column">column</option>
-              <option value="column-reverse">column-reverse</option>
-            </select>
-          </div>
+          {activeTab === 'flex' ? (
+            /* Flexbox controls */
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>flex-direction :</label>
+                <select value={direction} onChange={(e) => setDirection(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+                  <option value="row">row</option>
+                  <option value="row-reverse">row-reverse</option>
+                  <option value="column">column</option>
+                  <option value="column-reverse">column-reverse</option>
+                </select>
+              </div>
 
-          {/* justify-content */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>justify-content :</label>
-            <select value={justify} onChange={(e) => setJustify(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
-              <option value="flex-start">flex-start</option>
-              <option value="flex-end">flex-end</option>
-              <option value="center">center</option>
-              <option value="space-between">space-between</option>
-              <option value="space-around">space-around</option>
-              <option value="space-evenly">space-evenly</option>
-            </select>
-          </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>justify-content :</label>
+                <select value={justify} onChange={(e) => setJustify(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+                  <option value="flex-start">flex-start</option>
+                  <option value="flex-end">flex-end</option>
+                  <option value="center">center</option>
+                  <option value="space-between">space-between</option>
+                  <option value="space-around">space-around</option>
+                  <option value="space-evenly">space-evenly</option>
+                </select>
+              </div>
 
-          {/* align-items */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>align-items :</label>
-            <select value={align} onChange={(e) => setAlign(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
-              <option value="stretch">stretch</option>
-              <option value="flex-start">flex-start</option>
-              <option value="flex-end">flex-end</option>
-              <option value="center">center</option>
-              <option value="baseline">baseline</option>
-            </select>
-          </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>align-items :</label>
+                <select value={align} onChange={(e) => setAlign(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+                  <option value="stretch">stretch</option>
+                  <option value="flex-start">flex-start</option>
+                  <option value="flex-end">flex-end</option>
+                  <option value="center">center</option>
+                  <option value="baseline">baseline</option>
+                </select>
+              </div>
 
-          {/* flex-wrap */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>flex-wrap :</label>
-            <select value={wrap} onChange={(e) => setWrap(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
-              <option value="nowrap">nowrap</option>
-              <option value="wrap">wrap</option>
-              <option value="wrap-reverse">wrap-reverse</option>
-            </select>
-          </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>flex-wrap :</label>
+                <select value={wrap} onChange={(e) => setWrap(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+                  <option value="nowrap">nowrap</option>
+                  <option value="wrap">wrap</option>
+                  <option value="wrap-reverse">wrap-reverse</option>
+                </select>
+              </div>
+            </>
+          ) : (
+            /* CSS Grid controls */
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>grid-template-columns :</label>
+                <select value={gridCols} onChange={(e) => setGridCols(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+                  <option value="repeat(3, 1fr)">repeat(3, 1fr)</option>
+                  <option value="repeat(2, 1fr)">repeat(2, 1fr)</option>
+                  <option value="repeat(4, 1fr)">repeat(4, 1fr)</option>
+                  <option value="1fr 2fr 1fr">1fr 2fr 1fr (Asymétrique)</option>
+                  <option value="repeat(auto-fill, minmax(100px, 1fr))">repeat(auto-fill, minmax(100px, 1fr))</option>
+                </select>
+              </div>
 
-          {/* gap */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>grid-template-rows :</label>
+                <select value={gridRows} onChange={(e) => setGridRows(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+                  <option value="auto">auto</option>
+                  <option value="repeat(2, 1fr)">repeat(2, 1fr)</option>
+                  <option value="100px auto">100px auto</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>justify-items :</label>
+                <select value={justifyItems} onChange={(e) => setJustifyItems(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+                  <option value="stretch">stretch</option>
+                  <option value="start">start</option>
+                  <option value="end">end</option>
+                  <option value="center">center</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>align-items :</label>
+                <select value={alignItems} onChange={(e) => setAlignItems(e.target.value)} className="input-premium" style={{ width: '100%', padding: 8, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-light)' }}>
+                  <option value="stretch">stretch</option>
+                  <option value="start">start</option>
+                  <option value="end">end</option>
+                  <option value="center">center</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {/* Common controls: Gap and Item count */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 14 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>gap :</label>
               <span style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>{gap}px</span>
@@ -109,7 +196,6 @@ export default function FlexboxPlayground({ goBack }) {
             />
           </div>
 
-          {/* Item count */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Nombre d'items :</label>
@@ -118,7 +204,7 @@ export default function FlexboxPlayground({ goBack }) {
             <input 
               type="range" 
               min="2" 
-              max="10" 
+              max="12" 
               value={itemCount} 
               onChange={(e) => setItemCount(parseInt(e.target.value))} 
               style={{ width: '100%' }}
@@ -130,9 +216,10 @@ export default function FlexboxPlayground({ goBack }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Visual container */}
           <div className="glass-panel" style={{ padding: 20, borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>Prévisualisation interactive</h2>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white', margin: 0 }}>Prévisualisation interactive</h2>
+            
             <div 
-              style={{
+              style={activeTab === 'flex' ? {
                 display: 'flex',
                 flexDirection: direction,
                 justifyContent: justify,
@@ -142,28 +229,42 @@ export default function FlexboxPlayground({ goBack }) {
                 backgroundColor: 'rgba(0,0,0,0.3)',
                 border: '1px dashed var(--border-light)',
                 borderRadius: 12,
-                minHeight: 260,
+                minHeight: 300,
                 padding: 16,
-                transition: 'all 0.2s'
+                transition: 'all 0.25s'
+              } : {
+                display: 'grid',
+                gridTemplateColumns: gridCols,
+                gridTemplateRows: gridRows,
+                justifyItems: justifyItems,
+                alignItems: alignItems,
+                gap: `${gap}px`,
+                backgroundColor: 'rgba(0,0,0,0.3)',
+                border: '1px dashed var(--border-light)',
+                borderRadius: 12,
+                minHeight: 300,
+                padding: 16,
+                transition: 'all 0.25s'
               }}
             >
               {Array.from({ length: itemCount }).map((_, idx) => (
                 <div 
                   key={idx} 
                   style={{
-                    backgroundColor: `hsla(${(idx * 50) % 360}, 70%, 55%, 0.15)`,
-                    border: `1.5px solid hsla(${(idx * 50) % 360}, 70%, 55%, 0.5)`,
+                    backgroundColor: `hsla(${(idx * 40) % 360}, 75%, 60%, 0.15)`,
+                    border: `1.5px solid hsla(${(idx * 40) % 360}, 75%, 60%, 0.55)`,
                     borderRadius: 8,
-                    padding: '24px 32px',
+                    padding: activeTab === 'flex' ? '24px 32px' : '18px 24px',
                     color: 'white',
                     fontWeight: 'bold',
                     fontSize: '1.2rem',
                     textAlign: 'center',
-                    minWidth: 60,
-                    minHeight: 60,
+                    minWidth: 50,
+                    minHeight: 50,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    transition: 'all 0.2s'
                   }}
                 >
                   {idx + 1}
@@ -174,8 +275,8 @@ export default function FlexboxPlayground({ goBack }) {
 
           {/* Generated code */}
           <div className="glass-panel" style={{ padding: 20, borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>Code CSS généré</h2>
-            <pre style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: 12, borderRadius: 8, fontSize: '0.8rem', fontFamily: 'monospace', border: '1px solid var(--border-light)', overflowX: 'auto', margin: 0, color: '#10b981' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white', margin: 0 }}>Code CSS généré</h2>
+            <pre style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: 12, borderRadius: 8, fontSize: '0.85rem', fontFamily: 'monospace', border: '1px solid var(--border-light)', overflowX: 'auto', margin: 0, color: '#10b981', lineHeight: '1.4' }}>
               {generateCss()}
             </pre>
             <button onClick={handleCopyCss} className="btn-premium btn-secondary" style={{ width: '100%', padding: 12, borderRadius: 8, fontWeight: 'bold', justifyContent: 'center' }}>
@@ -183,6 +284,7 @@ export default function FlexboxPlayground({ goBack }) {
             </button>
           </div>
         </div>
+
       </div>
     </div>
   );

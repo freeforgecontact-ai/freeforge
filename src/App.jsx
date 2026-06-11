@@ -102,7 +102,7 @@ export default function App() {
     {
       id: 'color_contrast',
       title: 'Contraste de Couleur & A11y',
-      desc: 'Vérifiez la conformité WCAG 2.1 et simulez le daltonisme en temps réel sur Canvas.',
+      desc: 'Vérifiez la conformité WCAG 2.1 et simulez le daltonisme en temps réel avec des filtres de matrices de couleurs SVG.',
       category: 'design',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" style={{width:24, height:24}}>

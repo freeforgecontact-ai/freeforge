@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function MockApiServer({ goBack }) {
-  const [routes, setRoutes] = useState([
-    { id: '1', method: 'GET', path: '/users', status: 200, body: '[\n  { \"id\": 1, \"name\": \"Alice\" },\n  { \"id\": 2, \"name\": \"Bob\" }\n]' },
-    { id: '2', method: 'POST', path: '/login', status: 200, body: '{\n  \"status\": \"success\",\n  \"token\": \"mocked-jwt-token-xyz\"\n}' }
-  ]);
+  const [routes, setRoutes] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ff_mock_routes');
+      return saved ? JSON.parse(saved) : [
+        { id: '1', method: 'GET', path: '/users', status: 200, body: '[\n  { \"id\": 1, \"name\": \"Alice\" },\n  { \"id\": 2, \"name\": \"Bob\" }\n]' },
+        { id: '2', method: 'POST', path: '/login', status: 200, body: '{\n  \"status\": \"success\",\n  \"token\": \"mocked-jwt-token-xyz\"\n}' }
+      ];
+    } catch (e) {
+      console.error("Error reading ff_mock_routes", e);
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ff_mock_routes', JSON.stringify(routes));
+  }, [routes]);
 
   const [activeRouteId, setActiveRouteId] = useState('1');
   const [path, setPath] = useState('/users');
@@ -132,7 +144,7 @@ self.addEventListener('fetch', event => {
             Concevez graphiquement des routes d'API REST locales et exportez un Service Worker pour intercepter vos requêtes côté client.
           </p>
         </div>
-        <FolderButton toolId="mock_api" toolName="MockApiServer" />
+        <FolderButton toolId="mock_api" toolName="MockApiServer" localStorageKeys={['ff_mock_routes']} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 24 }}>
