@@ -165,3 +165,5 @@ L'outil `WebToExecutable` dans la suite `freeforge-dev2` appelle les points d'ac
     Si une IA ajoute des données locales complexes, assurez-vous de toujours utiliser `try { JSON.parse(...) } catch` pour éviter les plantages au chargement de l'outil si la clé du `localStorage` contient des données corrompues ou obsolètes.
 4.  **Impression PDF** :
     Assurez-vous que les classes `no-print` sont appliquées sur les éléments d'interface d'édition pour masquer les barres de contrôle et maximiser le rendu A4 sur fond blanc lors de l'impression PDF.
+5.  **Débogage des téléchargements audio (yt-dlp)** :
+    En raison de l'expérimentation de streaming SABR-only déployée par YouTube sur les flux mobiles, évitez de forcer l'argument d'extraction `--extractor-args youtube:player_client=android` dans les commandes `yt-dlp` sous peine de générer des erreurs `Requested format is not available`. Laissez `yt-dlp` gérer le choix du client par défaut.
