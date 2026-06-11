@@ -264,7 +264,7 @@ export default function AudioTrimmer({ goBack }) {
       </div>
 
       <h1 className="page-title">Découpeur Audio</h1>
-      <p className="page-subtitle">Coupez précisément vos fichiers audio locaux et exportez le résultat au format WAV sans serveur.</p>
+      <p className="page-subtitle">Coupez précisément vos fichiers audio locaux et exportez le résultat au format WAV sans perte (lossless) directement depuis votre navigateur.</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         {!audioBuffer ? (

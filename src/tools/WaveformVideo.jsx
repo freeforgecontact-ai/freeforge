@@ -218,7 +218,7 @@ export default function WaveformVideo({ goBack }) {
       </div>
 
       <h1 className="page-title">Générateur Waveform Vidéo</h1>
-      <p className="page-subtitle">Créez des vidéos musicales avec un spectre audio réactif animé, idéal pour Instagram ou TikTok, 100% hors-ligne.</p>
+      <p className="page-subtitle">Créez des vidéos musicales avec un spectre audio réactif animé au format WebM (100% hors-ligne et calculé localement par votre navigateur).</p>
 
       <div className="grid-2">
         {/* Left column: Setup parameters */}
