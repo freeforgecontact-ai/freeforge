@@ -2,14 +2,48 @@ import React, { useState, useEffect, useRef } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function CrosshairGenerator({ goBack }) {
-  const [color, setColor] = useState('#00ff00');
-  const [thickness, setThickness] = useState(2);
-  const [size, setSize] = useState(10);
-  const [gap, setGap] = useState(4);
-  const [dot, setDot] = useState(false);
-  const [outline, setOutline] = useState(true);
+  const [color, setColor] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_crosshair');
+      return saved ? JSON.parse(saved).color : '#00ff00';
+    } catch { return '#00ff00'; }
+  });
+  const [thickness, setThickness] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_crosshair');
+      return saved ? parseInt(JSON.parse(saved).thickness) : 2;
+    } catch { return 2; }
+  });
+  const [size, setSize] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_crosshair');
+      return saved ? parseInt(JSON.parse(saved).size) : 10;
+    } catch { return 10; }
+  });
+  const [gap, setGap] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_crosshair');
+      return saved ? parseInt(JSON.parse(saved).gap) : 4;
+    } catch { return 4; }
+  });
+  const [dot, setDot] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_crosshair');
+      return saved ? JSON.parse(saved).dot : false;
+    } catch { return false; }
+  });
+  const [outline, setOutline] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_crosshair');
+      return saved ? JSON.parse(saved).outline : true;
+    } catch { return true; }
+  });
   
   const canvasRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem('fg_crosshair', JSON.stringify({ color, thickness, size, gap, dot, outline }));
+  }, [color, thickness, size, gap, dot, outline]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

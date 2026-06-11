@@ -1,11 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function AimSensitivity({ goBack }) {
-  const [sourceGame, setSourceGame] = useState('cs2');
-  const [targetGame, setTargetGame] = useState('valorant');
-  const [sens, setSens] = useState(2.0);
-  const [dpi, setDpi] = useState(800);
+  const [sourceGame, setSourceGame] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_sens');
+      return saved ? JSON.parse(saved).sourceGame : 'cs2';
+    } catch { return 'cs2'; }
+  });
+  const [targetGame, setTargetGame] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_sens');
+      return saved ? JSON.parse(saved).targetGame : 'valorant';
+    } catch { return 'valorant'; }
+  });
+  const [sens, setSens] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_sens');
+      return saved ? parseFloat(JSON.parse(saved).sens) : 2.0;
+    } catch { return 2.0; }
+  });
+  const [dpi, setDpi] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_sens');
+      return saved ? parseInt(JSON.parse(saved).dpi) : 800;
+    } catch { return 800; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('fg_sens', JSON.stringify({ sourceGame, targetGame, sens, dpi }));
+  }, [sourceGame, targetGame, sens, dpi]);
 
   const yawData = {
     cs2: 0.022,

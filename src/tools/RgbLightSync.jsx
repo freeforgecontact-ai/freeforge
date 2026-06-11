@@ -2,10 +2,29 @@ import React, { useState, useEffect } from 'react';
 import FolderButton from '../components/FolderButton';
 
 export default function RgbLightSync({ goBack }) {
-  const [effect, setEffect] = useState('wave'); // 'wave', 'breath', 'static'
-  const [color, setColor] = useState('#ff00ea');
-  const [speed, setSpeed] = useState(2);
+  const [effect, setEffect] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_rgb');
+      return saved ? JSON.parse(saved).effect : 'wave';
+    } catch { return 'wave'; }
+  });
+  const [color, setColor] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_rgb');
+      return saved ? JSON.parse(saved).color : '#ff00ea';
+    } catch { return '#ff00ea'; }
+  });
+  const [speed, setSpeed] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fg_rgb');
+      return saved ? parseInt(JSON.parse(saved).speed) : 2;
+    } catch { return 2; }
+  });
   const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem('fg_rgb', JSON.stringify({ effect, color, speed }));
+  }, [effect, color, speed]);
 
   useEffect(() => {
     if (effect === 'static') return;

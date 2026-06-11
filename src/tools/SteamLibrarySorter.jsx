@@ -3,8 +3,13 @@ import FolderButton from '../components/FolderButton';
 
 export default function SteamLibrarySorter({ goBack }) {
   const [games, setGames] = useState(() => {
-    const val = localStorage.getItem('fg_backlog');
-    return val ? JSON.parse(val) : [];
+    try {
+      const val = localStorage.getItem('fg_backlog');
+      return val ? JSON.parse(val) : [];
+    } catch (e) {
+      console.error("Erreur lors de la lecture de fg_backlog:", e);
+      return [];
+    }
   });
   
   const [title, setTitle] = useState('');
@@ -41,13 +46,89 @@ export default function SteamLibrarySorter({ goBack }) {
     setGames(games.filter(g => g.id !== id));
   };
 
+  const handleExportJSON = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(games, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "steam_backlog.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleExportCSV = () => {
+    let csvContent = "data:text/csv;charset=utf-8,ID,Titre,Statut\n";
+    games.forEach(g => {
+      const escapedTitle = g.title.replace(/"/g, '""');
+      csvContent += `${g.id},"${escapedTitle}",${g.status}\n`;
+    });
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", encodeURI(csvContent));
+    downloadAnchor.setAttribute("download", "steam_backlog.csv");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target.result;
+        if (file.name.endsWith('.json')) {
+          const parsed = JSON.parse(text);
+          if (Array.isArray(parsed)) {
+            const clean = parsed.map(item => ({
+              id: item.id || Date.now().toString() + Math.random(),
+              title: item.title || 'Jeu sans nom',
+              status: ['todo', 'playing', 'done'].includes(item.status) ? item.status : 'todo'
+            }));
+            setGames([...games, ...clean]);
+            alert(`${clean.length} jeux importés avec succès !`);
+          } else {
+            alert("Format JSON invalide. Doit être un tableau.");
+          }
+        } else if (file.name.endsWith('.csv')) {
+          const lines = text.split('\n');
+          const imported = [];
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+              const id = parts[0].replace(/"/g, '') || Date.now().toString() + Math.random();
+              const title = parts[1].replace(/"/g, '');
+              const status = parts[2] ? parts[2].replace(/"/g, '').trim() : 'todo';
+              imported.push({ id, title, status: ['todo', 'playing', 'done'].includes(status) ? status : 'todo' });
+            }
+          }
+          if (imported.length > 0) {
+            setGames([...games, ...imported]);
+            alert(`${imported.length} jeux importés depuis le CSV avec succès !`);
+          } else {
+            alert("Aucun jeu valide trouvé dans le CSV.");
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Erreur lors de la lecture ou du parsing du fichier.");
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div style={{ padding: 24, color: '#f3f4f6' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <button onClick={goBack} className="btn-premium btn-secondary" style={{ padding: '8px 12px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>← Retour</button>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'white' }}>🎮 Steam Backlog Manager</h1>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Gérez vos jeux à finir et choisissez votre prochaine aventure.</p>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+            Saisie et gestion manuelle de votre bibliothèque Steam locale. Planifiez vos jeux à finir et choisissez votre prochaine aventure.
+          </p>
         </div>
         <FolderButton toolId="steam_sorter" toolName="SteamLibrarySorter" localStorageKeys={['fg_backlog']} />
       </div>
@@ -78,7 +159,21 @@ export default function SteamLibrarySorter({ goBack }) {
         </div>
 
         <div className="glass-panel" style={{ padding: 24, borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'white' }}>Backlog ({games.length})</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'white' }}>Backlog ({games.length})</h2>
+            <div style={{ display: 'flex', gap: 8 }} className="no-print">
+              <button onClick={handleExportJSON} className="btn-premium btn-secondary" style={{ fontSize: '0.75rem', padding: '4px 8px' }} title="Exporter au format JSON">
+                📥 JSON
+              </button>
+              <button onClick={handleExportCSV} className="btn-premium btn-secondary" style={{ fontSize: '0.75rem', padding: '4px 8px' }} title="Exporter au format CSV">
+                📥 CSV
+              </button>
+              <label className="btn-premium btn-secondary" style={{ fontSize: '0.75rem', padding: '4px 8px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }} title="Importer JSON ou CSV">
+                📤 Importer
+                <input type="file" accept=".json,.csv" onChange={handleImportFile} style={{ display: 'none' }} />
+              </label>
+            </div>
+          </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 400, overflowY: 'auto' }}>
             {games.length > 0 ? games.map(g => (
