@@ -43,7 +43,7 @@ L'outil `WebToExecutable` dans la suite `freeforge-dev2` appelle les points d'ac
 
 ---
 
-## 3. Descriptif Complet des Outils par Suite (114 Outils au Total)
+## 3. Descriptif Complet des Outils par Suite (115 Outils au Total)
 
 ### ⚜️ Suite 1 : FreeForge Majeure (`freeforge` - Port 5174)
 1.  **VibeLocal (Radio Premium)** : Lecteur de musique local contournant le blocage IP YouTube par l'argument `--extractor-args youtube:player_client=android` et authentification par fichier local `cookies.txt`.
@@ -74,6 +74,7 @@ L'outil `WebToExecutable` dans la suite `freeforge-dev2` appelle les points d'ac
 7.  **Flexbox & Grid Playground** : Concepteur interactif de structures flex et grilles CSS.
 8.  **Color Contrast & A11y Checker** : Ratios WCAG 2.1 et filtres SVG de daltonisme.
 9.  **WebToExecutable** : Compilateur local en Windows EXE (C# `csc.exe`) et Android ZIP.
+10. **Convertisseur de Médias** : Encodage et conversion en lot d'images, vidéos et audio via FFmpeg en tâche de fond sur le serveur local Node.js.
 
 ### 🎮 Suite 3 : Suite Gamers (`freeforge-gamers` - Port 5176)
 1.  **Crosshair Generator & Exporter** : Conception visuelle de viseurs pour FPS et export PNG.
