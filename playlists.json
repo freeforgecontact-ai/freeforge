@@ -1,0 +1,48 @@
+[
+  {
+    "name": "Ma playlist de test",
+    "songs": [
+      {
+        "id": "xakBzg5atsM",
+        "title": "massobeats - rose water (royalty free lofi music)",
+        "duration": "2:19",
+        "seconds": 139,
+        "thumbnail": "https://i.ytimg.com/vi/xakBzg5atsM/hq720.jpg",
+        "author": "massobeats",
+        "views": 1212278,
+        "ago": "3 years ago",
+        "url": "https://youtube.com/watch?v=xakBzg5atsM",
+        "downloaded": true,
+        "downloading": false,
+        "progress": 0
+      },
+      {
+        "id": "GllEDACUbNo",
+        "title": "50 Cent - Just A Lil Bit",
+        "duration": "4:18",
+        "seconds": 258,
+        "thumbnail": "https://i.ytimg.com/vi/GllEDACUbNo/hq720.jpg",
+        "author": "50 Cent",
+        "views": 655711685,
+        "ago": "16 years ago",
+        "url": "https://youtube.com/watch?v=GllEDACUbNo",
+        "downloaded": false,
+        "downloading": false,
+        "progress": 0
+      }
+    ]
+  },
+  {
+    "name": "Playlist Importée de PGRG",
+    "songs": [
+      {
+        "id": "dQw4w9WgXcQ",
+        "title": "Rick Astley - Never Gonna Give You Up (Official Video)",
+        "author": "Rick Astley",
+        "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+        "duration": "3:33",
+        "seconds": 213
+      }
+    ]
+  }
+]
