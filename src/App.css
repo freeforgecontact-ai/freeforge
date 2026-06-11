@@ -1,0 +1,52 @@
+/* Custom styles for Audio Suite */
+.drum-pad {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  height: 50px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+.drum-pad:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.drum-pad.active {
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+  border-color: var(--primary);
+}
+.piano-key {
+  background: white;
+  color: black;
+  border: 1px solid #ddd;
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+  font-weight: bold;
+}
+.piano-key:active, .piano-key.active {
+  background: #e0e0e0;
+}
+.piano-key-black {
+  background: #111;
+  color: white;
+  height: 100px;
+  z-index: 10;
+  margin-left: -15px;
+  margin-right: -15px;
+  width: 30px;
+}
+.piano-key-black:active, .piano-key-black.active {
+  background: #333;
+}
+.audio-visualizer-canvas {
+  width: 100%;
+  height: 240px;
+  background-color: #0b0b10;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+}
