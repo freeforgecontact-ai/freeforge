@@ -3,11 +3,19 @@ import FolderButton from '../components/FolderButton';
 
 export default function CryptoPortfolio({ goBack }) {
   const [assets, setAssets] = useState(() => {
-    const saved = localStorage.getItem('ff_crypto');
-    return saved ? JSON.parse(saved) : [
-      { id: '1', symbol: 'BTC', name: 'Bitcoin', amount: 0.12, avgPrice: 65000, currentPrice: 68500 },
-      { id: '2', symbol: 'ETH', name: 'Ethereum', amount: 1.5, avgPrice: 3200, currentPrice: 3450 }
-    ];
+    try {
+      const saved = localStorage.getItem('ff_crypto');
+      return saved ? JSON.parse(saved) : [
+        { id: '1', symbol: 'BTC', name: 'Bitcoin', amount: 0.12, avgPrice: 65000, currentPrice: 68500 },
+        { id: '2', symbol: 'ETH', name: 'Ethereum', amount: 1.5, avgPrice: 3200, currentPrice: 3450 }
+      ];
+    } catch (e) {
+      console.error("Erreur lors de la lecture de ff_crypto:", e);
+      return [
+        { id: '1', symbol: 'BTC', name: 'Bitcoin', amount: 0.12, avgPrice: 65000, currentPrice: 68500 },
+        { id: '2', symbol: 'ETH', name: 'Ethereum', amount: 1.5, avgPrice: 3200, currentPrice: 3450 }
+      ];
+    }
   });
 
   const [symbol, setSymbol] = useState('');
@@ -96,7 +104,7 @@ export default function CryptoPortfolio({ goBack }) {
             🪙 Crypto Portfolio Tracker
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-            Suivi de vos actifs cryptographiques en temps réel et simulation de portefeuille.
+            Suivi local de vos actifs cryptographiques (données simulées hors-ligne pour démonstration).
           </p>
         </div>
         <FolderButton toolId="crypto_tracker" toolName="CryptoPortfolio" localStorageKeys={["ff_crypto"]} />
@@ -135,9 +143,14 @@ export default function CryptoPortfolio({ goBack }) {
         <div className="glass-panel" style={{ padding: 24, borderRadius: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'white' }}>Actifs détenus</h2>
-            <button onClick={simulateMarket} className="btn-premium btn-secondary" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>
-              ⚡ Simuler fluctuation
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+              <button onClick={simulateMarket} className="btn-premium btn-secondary" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>
+                ⚡ Simuler fluctuation (Démo)
+              </button>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                *Prix simulés localement (±5% démo)
+              </span>
+            </div>
           </div>
 
           <div style={{ overflowX: 'auto' }}>
