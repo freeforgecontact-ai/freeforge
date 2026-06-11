@@ -40,7 +40,7 @@ L'outil `WebToExecutable` dans la suite `freeforge-dev2` appelle les points d'ac
 
 ---
 
-## 3. Descriptif Complet des Outils par Suite (81 Outils au Total)
+## 3. Descriptif Complet des Outils par Suite (90 Outils au Total)
 
 ### ⚜️ Suite 1 : FreeForge Majeure (`freeforge` - Port 5174)
 1.  **VibeLocal (Radio Premium)** : Lecteur de musique local contournant le blocage IP YouTube par l'argument `--extractor-args youtube:player_client=android` et authentification par fichier local `cookies.txt`.
