@@ -40,7 +40,11 @@ export default function AutonomeCalculateur({ goBack }) {
       
       if (remaining <= 0) break;
     }
-    return tax;
+    // Crédit d'impôt personnel de base fédéral (~16 129 $ × 15 %), puis
+    // abattement du Québec de 16,5 % accordé aux résidents du Québec.
+    const fedBasicCredit = 16129 * 0.15;
+    const afterCredit = Math.max(0, tax - fedBasicCredit);
+    return afterCredit * (1 - 0.165);
   };
 
   const calculateProvincialTax = (income) => {
@@ -67,8 +71,9 @@ export default function AutonomeCalculateur({ goBack }) {
       
       if (remaining <= 0) break;
     }
-    // Apply provincial tax abatement (16.5% of federal basic tax refund or basic credit credits, simplified to basic credits)
-    return tax;
+    // Crédit d'impôt personnel de base du Québec (~18 571 $ × 14 %).
+    const provBasicCredit = 18571 * 0.14;
+    return Math.max(0, tax - provBasicCredit);
   };
 
   useEffect(() => {

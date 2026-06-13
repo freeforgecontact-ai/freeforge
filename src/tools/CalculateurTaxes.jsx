@@ -262,7 +262,7 @@ export default function CalculateurTaxes({ goBack }) {
               ))}
             </div>
           ) : (
-            <div style={{ padding: '24px 0', textHTML: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', fontStyle: 'italic', textAlign: 'center' }}>
+            <div style={{ padding: '24px 0', color: 'var(--text-muted)', fontSize: '0.85rem', fontStyle: 'italic', textAlign: 'center' }}>
               Aucun calcul dans l'historique local.
             </div>
           )}

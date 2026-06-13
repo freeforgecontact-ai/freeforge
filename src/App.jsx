@@ -113,7 +113,7 @@ export default function App() {
     {
       id: 'waveform',
       title: 'Générateur Waveform Vidéo',
-      desc: 'Transformez vos fichiers audio en vidéos MP4 animées avec spectre pour vos réseaux.',
+      desc: 'Transformez vos fichiers audio en vidéos WebM animées avec spectre pour vos réseaux.',
       category: 'media',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" style={{width:24, height:24}}>

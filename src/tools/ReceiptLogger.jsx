@@ -408,7 +408,7 @@ export default function ReceiptLogger({ goBack }) {
                 </div>
               ))
             ) : (
-              <div style={{ padding: '40px 0', textHTML: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', fontStyle: 'italic', textAlign: 'center' }}>
+              <div style={{ padding: '40px 0', color: 'var(--text-muted)', fontSize: '0.85rem', fontStyle: 'italic', textAlign: 'center' }}>
                 Aucun reçu enregistré dans le registre.
               </div>
             )}

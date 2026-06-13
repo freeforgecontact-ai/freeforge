@@ -270,7 +270,7 @@ export default function RegistreKilo({ goBack }) {
                 </tbody>
               </table>
             ) : (
-              <div style={{ padding: '40px 0', textHTML: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', fontStyle: 'italic', textAlign: 'center' }}>
+              <div style={{ padding: '40px 0', color: 'var(--text-muted)', fontSize: '0.85rem', fontStyle: 'italic', textAlign: 'center' }}>
                 Aucun trajet consigné. Remplissez le formulaire à gauche pour démarrer votre registre.
               </div>
             )}
