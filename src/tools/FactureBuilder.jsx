@@ -35,9 +35,16 @@ export default function FactureBuilder({ goBack }) {
   const [taxMode, setTaxMode] = useState('both'); // 'both' | 'tps' | 'none'
   const [paymentTerms, setPaymentTerms] = useState('Payable dans les 30 jours.');
 
-  // Save company profile template
+  // Save company profile template (robuste : ne jamais planter si le stockage est plein)
   useEffect(() => {
-    localStorage.setItem('freeforge_invoice_profile', JSON.stringify(profile));
+    try {
+      localStorage.setItem('freeforge_invoice_profile', JSON.stringify(profile));
+    } catch (err) {
+      try {
+        const { companyLogo, ...rest } = profile;
+        localStorage.setItem('freeforge_invoice_profile', JSON.stringify(rest));
+      } catch (e2) { /* stockage indisponible : on ignore sans planter */ }
+    }
   }, [profile]);
 
   const handleProfileChange = (key, value) => {
@@ -49,7 +56,30 @@ export default function FactureBuilder({ goBack }) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      handleProfileChange('companyLogo', event.target.result);
+      const dataUrl = event.target.result;
+      // Redimensionne le logo (max 320px) pour rester leger et tenir dans le stockage local
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const max = 320;
+          let width = img.width;
+          let height = img.height;
+          if (width > max || height > max) {
+            const ratio = Math.min(max / width, max / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          handleProfileChange('companyLogo', canvas.toDataURL('image/png'));
+        } catch (err) {
+          handleProfileChange('companyLogo', dataUrl);
+        }
+      };
+      img.onerror = () => handleProfileChange('companyLogo', dataUrl);
+      img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   };
